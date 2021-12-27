@@ -1,0 +1,37 @@
+struct CustomSecureField: View {
+    
+    @FocusState var focused: focusedField?
+    @State var showPassword: Bool = false
+    @Binding var password: String
+    
+    var body: some View {
+        HStack {
+            ZStack(alignment: .trailing) {
+                TextField("Password", text: $password)
+                    .focused($focused, equals: .unSecure)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                // This is needed to remove suggestion bar, otherwise swapping between
+                // fields will change keyboard height and be distracting to user.
+                    .keyboardType(.alphabet)
+                    .opacity(showPassword ? 1 : 0)
+                SecureField("Password", text: $password)
+                    .focused($focused, equals: .secure)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .opacity(showPassword ? 0 : 1)
+                Button(action: {
+                    showPassword.toggle()
+                    focused = focused == .secure ? .unSecure : .secure
+                }, label: {
+                    Image(systemName: self.showPassword ? "eye.slash.fill" : "eye.fill")
+                        .padding()
+                })
+            }
+        }
+    }
+    // Using the enum makes the code clear as to what field is focused.
+    enum focusedField {
+        case secure, unSecure
+    }
+}
